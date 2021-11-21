@@ -1,0 +1,25 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>BancoDoBrasilPixClient</id>
+    <version>1.0.0</version>
+    <authors>rodcorporation</authors>
+    <owners>rodcorporation</owners>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/rodcorporation/BancoDoBrasilPixClient</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Client para integração do PIX do banco do brasil.</description>
+    <copyright>Copyright 2021</copyright>
+    <language>pt-BR</language>
+    <tags>TotalExpress WebService</tags>
+    <repository type="git" url="https://github.com/rodcorporation/BancoDoBrasilPixClient" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.7.2" />
+    </dependencies>
+	<contentFiles>
+	</contentFiles>
+  </metadata>
+  <files>
+	<file src="bin\Release\*.dll" target="lib\net472" />
+  </files>
+</package>

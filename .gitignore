@@ -349,3 +349,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /BancoDoBrasilPixClient.Test/credentials.json
+/BancoDoBrasilPixClient.Lib/PutInNugetOrg.txt

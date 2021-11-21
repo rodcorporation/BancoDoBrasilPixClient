@@ -14,8 +14,9 @@ namespace BancoDoBrasilPixClient.Lib
 {
     /*
      *   Verificação de Recebimento
-     *   A funcionalidade de verificação de recebimento permite que o usuário recebedor verifique o status QR Dinâmico e de transação identificada pelo txid preenchidas em transferências manuais e QR Estático, 
-     *   bem como o payload JSON vigente. Os possíveis status são:
+     *   
+     *   A funcionalidade de verificação de recebimento permite que o usuário recebedor verifique o status QR Dinâmico e de transação identificada pelo txid
+     *   preenchidas em transferências manuais e QR Estático, bem como o payload JSON vigente. Os possíveis status são:
      *   
      *   ATIVA: a cobrança está disponível, porém ainda não ocorreu pagamento;
      *   CONCLUIDA: a cobrança encontra-se paga. Não se pode alterar e nem remover uma cobrança cujo status esteja “CONCLUÍDA”;
@@ -24,8 +25,8 @@ namespace BancoDoBrasilPixClient.Lib
      *   DEVOLVIDO: cobrança com devolução realizada pelo Sistema de Pagamentos Instantâneos (SPI);
      *   REMOVIDA_PELO_USUARIO_RECEBEDOR: foi solicitada a remoção da cobrança; a critério do usuário;
      *   REMOVIDA_PELO_PSP: recebedor, por conta de algum critério, solicitou a remoção da cobrança.
+     *   
      *   Adicionalmente ao status, a automação do usuário recebedor obterá acesso ao payload assinado que representa a cobrança, para fins de controle.
-     *
      */
     public sealed partial class PixClient
     {
