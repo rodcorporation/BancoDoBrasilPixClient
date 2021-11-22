@@ -54,7 +54,7 @@ namespace BancoDoBrasilPixClient.Test
             await client.Autenticar(PixClient.Scopes.AllScopes);
 
             // act
-            var response = await client.ConsultarPix(Convert.ToDateTime($"{DateTime.Now:dd/MM/yyyy} 00:00:00"),
+            var response = await client.ConsultarPix(Convert.ToDateTime($"{DateTime.Now.AddYears(-1):dd/MM/yyyy} 00:00:00"),
                                                      Convert.ToDateTime($"{DateTime.Now:dd/MM/yyyy} 23:59:59"),
                                                      1);
 
@@ -66,7 +66,6 @@ namespace BancoDoBrasilPixClient.Test
         public async Task ConsultarPorTxId()
         {
             // arrange
-            var txId = $"{DateTime.Now:yyyyMMddHHmmss}59ac32b2a8b840";
             var client = new PixClient(EnvironmentType.Testing,
                                        _credentials.ClientId,
                                        _credentials.ClientSecret,
@@ -93,11 +92,10 @@ namespace BancoDoBrasilPixClient.Test
                 SolicitacaoPagador = "Pagamento pedido Nº 4321"
             };
 
-            await client.CriarCobranca(txId,
-                                       requestCriarCobranca);
+            var responseCriarCobranca = await client.CriarCobranca(requestCriarCobranca);
 
             // act
-            var response = await client.ConsultarPixPorTxId(txId);
+            var response = await client.ConsultarPixPorTxId(responseCriarCobranca.TxId);
 
             // assert
             Assert.IsNotNull(response);
@@ -107,7 +105,6 @@ namespace BancoDoBrasilPixClient.Test
         public async Task CriarCobranca()
         {
             // arrange
-            var txId = $"{DateTime.Now:yyyyMMddHHmmss}5fc1e5cfe7e94c";
             var client = new PixClient(EnvironmentType.Testing,
                                        _credentials.ClientId,
                                        _credentials.ClientSecret,
@@ -133,8 +130,7 @@ namespace BancoDoBrasilPixClient.Test
             };
 
             // act
-            var response = await client.CriarCobranca(txId,
-                                                      request);
+            var response = await client.CriarCobranca(request);
 
             // assert
             Assert.IsNotNull(response);
@@ -144,7 +140,6 @@ namespace BancoDoBrasilPixClient.Test
         public async Task RevisarCobranca()
         {
             // arrange
-            var txId = $"{DateTime.Now:yyyyMMddHHmmss}fbad743c4ed94a";
             var client = new PixClient(EnvironmentType.Testing,
                                        _credentials.ClientId,
                                        _credentials.ClientSecret,
@@ -171,8 +166,7 @@ namespace BancoDoBrasilPixClient.Test
                 SolicitacaoPagador = "Pagamento pedido Nº 4321"
             };
 
-            await client.CriarCobranca(txId,
-                                       requestCriarCobranca);
+            var responseCriarCobranca = await client.CriarCobranca(requestCriarCobranca);
 
             var requestRevisarCobranca = new RevisarCobrancaRequestModel()
             {
@@ -194,7 +188,7 @@ namespace BancoDoBrasilPixClient.Test
             };
 
             // act
-            var response = await client.RevisarCobranca(txId,
+            var response = await client.RevisarCobranca(responseCriarCobranca.TxId,
                                                         requestRevisarCobranca);
 
             // assert
@@ -211,7 +205,7 @@ namespace BancoDoBrasilPixClient.Test
                                        _credentials.ApplicationKey);
             await client.Autenticar(PixClient.Scopes.AllScopes);
 
-            var responseConsultar = await client.ConsultarPix(Convert.ToDateTime($"{DateTime.Now:dd/MM/yyyy} 00:00:00"),
+            var responseConsultar = await client.ConsultarPix(Convert.ToDateTime($"{DateTime.Now.AddYears(-1):dd/MM/yyyy} 00:00:00"),
                                                               Convert.ToDateTime($"{DateTime.Now:dd/MM/yyyy} 23:59:59"),
                                                               1);
 
@@ -226,7 +220,6 @@ namespace BancoDoBrasilPixClient.Test
         public async Task GerarQrCodeEmPng()
         {
             // arrange
-            var txId = $"{DateTime.Now:yyyyMMddHHmmss}583f081b913c40";
             var client = new PixClient(EnvironmentType.Testing,
                                        _credentials.ClientId,
                                        _credentials.ClientSecret,
@@ -253,11 +246,10 @@ namespace BancoDoBrasilPixClient.Test
                 SolicitacaoPagador = "Pagamento pedido Nº 4321"
             };
 
-            var responseCriarCobranca = await client.CriarCobranca(txId,
-                                                                   requestCriarCobranca);
+            var responseCriarCobranca = await client.CriarCobranca(requestCriarCobranca);
 
             // act   
-            var imagem = client.GerarQrCodeEmPng(responseCriarCobranca.TextoImagemQRcode);
+            var imagem = PixClient.GerarQrCodeEmPng(responseCriarCobranca.TextoImagemQRcode);
 
             // assert
             // File.WriteAllBytes(@"D:\Temp\imagem.png", imagem);
@@ -268,7 +260,6 @@ namespace BancoDoBrasilPixClient.Test
         public async Task GerarQrCodeEmBase64()
         {
             // arrange
-            var txId = $"{DateTime.Now:yyyyMMddHHmmss}583f081b913c40";
             var client = new PixClient(EnvironmentType.Testing,
                                        _credentials.ClientId,
                                        _credentials.ClientSecret,
@@ -295,11 +286,10 @@ namespace BancoDoBrasilPixClient.Test
                 SolicitacaoPagador = "Pagamento pedido Nº 4321"
             };
 
-            var responseCriarCobranca = await client.CriarCobranca(txId,
-                                                                   requestCriarCobranca);
+            var responseCriarCobranca = await client.CriarCobranca(requestCriarCobranca);
 
             // act   
-            var imagemEmBase64 = client.GerarQrCodeEmBase64(responseCriarCobranca.TextoImagemQRcode);
+            var imagemEmBase64 = PixClient.GerarQrCodeEmBase64(responseCriarCobranca.TextoImagemQRcode);
 
             // assert
             Assert.IsNotNull(imagemEmBase64);

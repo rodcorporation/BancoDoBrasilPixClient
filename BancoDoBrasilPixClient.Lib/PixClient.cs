@@ -151,8 +151,7 @@ namespace BancoDoBrasilPixClient.Lib
             }
         }
 
-        public async Task<CriarCobrancaResponseModel> CriarCobranca(string txId,
-                                                                    CriarCobrancaRequestModel requestModel)
+        public async Task<CriarCobrancaResponseModel> CriarCobranca(CriarCobrancaRequestModel requestModel)
         {
             if (!_autenticado)
                 throw new Exception("Cliente não autenticado.");
@@ -163,7 +162,7 @@ namespace BancoDoBrasilPixClient.Lib
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _jwt);
 
-                var uriRecurso = $"/pix/v1/cobqrcode/{txId}?gw-dev-app-key={_applicationKey}";
+                var uriRecurso = $"/pix/v1/cobqrcode/?gw-dev-app-key={_applicationKey}";
 
                 var body = new StringContent(JsonConvert.SerializeObject(requestModel), Encoding.UTF8, "application/json");
 
@@ -244,7 +243,7 @@ namespace BancoDoBrasilPixClient.Lib
             }
         }
 
-        public string GerarQrCodeEmBase64(string textoImagemQrCode)
+        public static string GerarQrCodeEmBase64(string textoImagemQrCode)
         {
             var qrCodeGenerator = new QRCodeGenerator();
             var qrCodeData = qrCodeGenerator.CreateQrCode(textoImagemQrCode, QRCodeGenerator.ECCLevel.Q);
@@ -252,7 +251,7 @@ namespace BancoDoBrasilPixClient.Lib
             return $"data:image/jpg;base64,{qrCodeBase64.GetGraphic(20, Color.Black, Color.White, true, Base64QRCode.ImageType.Jpeg)}";
         }
 
-        public byte[] GerarQrCodeEmPng(string textoImagemQrCode)
+        public static byte[] GerarQrCodeEmPng(string textoImagemQrCode)
         {
             var qrCodeGenerator = new QRCodeGenerator();
             var qrCodeData = qrCodeGenerator.CreateQrCode(textoImagemQrCode, QRCodeGenerator.ECCLevel.Q);
