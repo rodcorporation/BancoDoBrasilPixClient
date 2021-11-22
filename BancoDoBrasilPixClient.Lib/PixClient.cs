@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using QRCoder;
 using System;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -30,6 +31,8 @@ namespace BancoDoBrasilPixClient.Lib
      */
     public sealed partial class PixClient
     {
+        #region Attributes
+
         private readonly HttpStatusCode[] HttpStatusCode2xx;
         private readonly EnvironmentType _environmentType;
         private readonly string _applicationKey;
@@ -40,6 +43,9 @@ namespace BancoDoBrasilPixClient.Lib
         private bool _autenticado;
         private string _jwt;
 
+        #endregion
+
+        #region Constructor
 
         public PixClient(EnvironmentType environmentType,
                          string clientId,
@@ -61,7 +67,259 @@ namespace BancoDoBrasilPixClient.Lib
             _autenticado = false;
         }
 
-        public async Task Autenticar(string[] scopes)
+        #endregion
+
+        #region Non-Async Methods
+
+        public void Autenticar(string[] scopes)
+        {
+            var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetOAuthUrl(_environmentType)}/oauth/token");
+            request.Method = "POST";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.ContentType = "application/x-www-form-urlencoded";
+
+            request.Headers.Add("Authorization", $"Basic {GetBasicAuthorization()}");
+
+            byte[] byteArray = Encoding.UTF8.GetBytes($"grant_type=client_credentials&scope={string.Join(" ", scopes)}");
+
+            var dataStream = request.GetRequestStream();
+            dataStream.Write(byteArray, 0, byteArray.Length);
+            dataStream.Close();
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                // Se der erro.
+                if (!HttpStatusCode2xx.Contains(response.StatusCode))
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string content = reader.ReadToEnd();
+                        throw new Exception($"Ocorreu um erro ao tentar autenticar: {content}");
+                    }
+                }
+                else
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string responseBody = reader.ReadToEnd();
+
+                        var authenticateResponse = JsonConvert.DeserializeObject<AutenticarResponseModel>(responseBody);
+
+                        _autenticado = true;
+                        _jwt = authenticateResponse.AccessToken;
+                    }
+                }
+            }
+        }
+
+        public ConsultarResponseModel ConsultarPix(DateTime inicio,
+                                                   DateTime fim,
+                                                   int paginaAtual)
+        {
+            if (!_autenticado)
+                throw new Exception("Cliente não autenticado.");
+
+            var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetPixUrl(_environmentType)}/pix/v1?gw-dev-app-key={_applicationKey}&inicio={inicio:yyyy-MM-ddTHH:mm:ss.00-03:00}&fim={fim:yyyy-MM-ddTHH:mm:ss.00-03:00}&paginacao.paginaAtual={paginaAtual}");
+
+            request.Method = "GET";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.ContentType = "application/x-www-form-urlencoded";
+
+            request.Headers.Add("Authorization", $"Bearer {_jwt}");
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                // Se der erro.
+                if (!HttpStatusCode2xx.Contains(response.StatusCode))
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string content = reader.ReadToEnd();
+                        throw new Exception($"Ocorreu um erro ao tentar consultar pix: {content}");
+                    }
+                }
+                else
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string responseBody = reader.ReadToEnd();
+
+                        var consultarResponse = JsonConvert.DeserializeObject<ConsultarResponseModel>(responseBody);
+
+                        return consultarResponse;
+                    }
+                }
+            }
+        }
+
+        public ConsultarPorTxIdResponseModel ConsultarPixPorTxId(string txId)
+        {
+            if (!_autenticado)
+                throw new Exception("Cliente não autenticado.");
+
+            var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetPixUrl(_environmentType)}/pix/v1/cob/{txId}?gw-dev-app-key={_applicationKey}");
+
+            request.Method = "GET";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.ContentType = "application/x-www-form-urlencoded";
+
+            request.Headers.Add("Authorization", $"Bearer {_jwt}");
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                // Se der erro.
+                if (!HttpStatusCode2xx.Contains(response.StatusCode))
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string content = reader.ReadToEnd();
+                        throw new Exception($"Ocorreu um erro ao tentar consultar pix por txid: {content}");
+                    }
+                }
+                else
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string responseBody = reader.ReadToEnd();
+
+                        var consultarResponse = JsonConvert.DeserializeObject<ConsultarPorTxIdResponseModel>(responseBody);
+
+                        return consultarResponse;
+                    }
+                }
+            }
+        }
+
+        public CriarCobrancaResponseModel CriarCobranca(CriarCobrancaRequestModel requestModel)
+        {
+            if (!_autenticado)
+                throw new Exception("Cliente não autenticado.");
+
+            var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetPixUrl(_environmentType)}/pix/v1/cobqrcode/?gw-dev-app-key={_applicationKey}");
+            request.Method = "PUT";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.ContentType = "application/json";
+
+            request.Headers.Add("Authorization", $"Bearer {_jwt}");
+
+            byte[] byteArray = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestModel));
+
+            var dataStream = request.GetRequestStream();
+            dataStream.Write(byteArray, 0, byteArray.Length);
+            dataStream.Close();
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                // Se der erro.
+                if (!HttpStatusCode2xx.Contains(response.StatusCode))
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string content = reader.ReadToEnd();
+                        throw new Exception($"Ocorreu um erro ao tentar criar uma cobrança: {content}");
+                    }
+                }
+                else
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string responseBody = reader.ReadToEnd();
+
+                        var criarCobrancaResponse = JsonConvert.DeserializeObject<CriarCobrancaResponseModel>(responseBody);
+
+                        return criarCobrancaResponse;
+                    }
+                }
+            }
+        }
+
+        public RevisarCobrancaResponseModel RevisarCobranca(string txId,
+                                                            RevisarCobrancaRequestModel requestModel)
+        {
+            if (!_autenticado)
+                throw new Exception("Cliente não autenticado.");
+
+            var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetPixUrl(_environmentType)}/pix/v1/cob/{txId}?gw-dev-app-key={_applicationKey}");
+            request.Method = "PATCH";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.ContentType = "application/json";
+
+            request.Headers.Add("Authorization", $"Bearer {_jwt}");
+
+            byte[] byteArray = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestModel));
+
+            var dataStream = request.GetRequestStream();
+            dataStream.Write(byteArray, 0, byteArray.Length);
+            dataStream.Close();
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                // Se der erro.
+                if (!HttpStatusCode2xx.Contains(response.StatusCode))
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string content = reader.ReadToEnd();
+                        throw new Exception($"Ocorreu um erro ao tentar revisar uma cobrança: {content}");
+                    }
+                }
+                else
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string responseBody = reader.ReadToEnd();
+
+                        var revisarCobrancaResponse = JsonConvert.DeserializeObject<RevisarCobrancaResponseModel>(responseBody);
+
+                        return revisarCobrancaResponse;
+                    }
+                }
+            }
+        }
+
+        public ConsultarPorEndToEndIdResponseModel ConsultarPixPorEndToEndId(string endToEndId)
+        {
+            if (!_autenticado)
+                throw new Exception("Cliente não autenticado.");
+
+            var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetPixUrl(_environmentType)}/pix/v1/pix/{endToEndId}?gw-dev-app-key={_applicationKey}");
+
+            request.Method = "GET";
+            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.ContentType = "application/x-www-form-urlencoded";
+
+            request.Headers.Add("Authorization", $"Bearer {_jwt}");
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                // Se der erro.
+                if (!HttpStatusCode2xx.Contains(response.StatusCode))
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string content = reader.ReadToEnd();
+                        throw new Exception($"Ocorreu um erro ao tentar consultar o pix por end-to-end-id: {content}");
+                    }
+                }
+                else
+                {
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        string responseBody = reader.ReadToEnd();
+
+                        var consultarResponse = JsonConvert.DeserializeObject<ConsultarPorEndToEndIdResponseModel>(responseBody);
+
+                        return consultarResponse;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Async Methods
+
+        public async Task AutenticarAsync(string[] scopes)
         {
             var basicAuthorization = GetBasicAuthorization();
 
@@ -92,9 +350,9 @@ namespace BancoDoBrasilPixClient.Lib
             }
         }
 
-        public async Task<ConsultarResponseModel> ConsultarPix(DateTime inicio,
-                                                               DateTime fim,
-                                                               int paginaAtual)
+        public async Task<ConsultarResponseModel> ConsultarPixAsync(DateTime inicio,
+                                                                    DateTime fim,
+                                                                    int paginaAtual)
         {
             if (!_autenticado)
                 throw new Exception("Cliente não autenticado.");
@@ -122,7 +380,7 @@ namespace BancoDoBrasilPixClient.Lib
             }
         }
 
-        public async Task<ConsultarPorTxIdResponseModel> ConsultarPixPorTxId(string txId)
+        public async Task<ConsultarPorTxIdResponseModel> ConsultarPixPorTxIdAsync(string txId)
         {
             if (!_autenticado)
                 throw new Exception("Cliente não autenticado.");
@@ -151,7 +409,7 @@ namespace BancoDoBrasilPixClient.Lib
             }
         }
 
-        public async Task<CriarCobrancaResponseModel> CriarCobranca(CriarCobrancaRequestModel requestModel)
+        public async Task<CriarCobrancaResponseModel> CriarCobrancaAsync(CriarCobrancaRequestModel requestModel)
         {
             if (!_autenticado)
                 throw new Exception("Cliente não autenticado.");
@@ -182,8 +440,8 @@ namespace BancoDoBrasilPixClient.Lib
             }
         }
 
-        public async Task<RevisarCobrancaResponseModel> RevisarCobranca(string txId,
-                                                                        RevisarCobrancaRequestModel requestModel)
+        public async Task<RevisarCobrancaResponseModel> RevisarCobrancaAsync(string txId,
+                                                                             RevisarCobrancaRequestModel requestModel)
         {
             if (!_autenticado)
                 throw new Exception("Cliente não autenticado.");
@@ -214,7 +472,7 @@ namespace BancoDoBrasilPixClient.Lib
             }
         }
 
-        public async Task<ConsultarPorEndToEndIdResponseModel> ConsultarPixPorEndToEndId(string endToEndId)
+        public async Task<ConsultarPorEndToEndIdResponseModel> ConsultarPixPorEndToEndIdAsync(string endToEndId)
         {
             if (!_autenticado)
                 throw new Exception("Cliente não autenticado.");
@@ -243,6 +501,10 @@ namespace BancoDoBrasilPixClient.Lib
             }
         }
 
+        #endregion
+
+        #region Métodos Estáticos
+
         public static string GerarQrCodeEmBase64(string textoImagemQrCode)
         {
             var qrCodeGenerator = new QRCodeGenerator();
@@ -258,6 +520,8 @@ namespace BancoDoBrasilPixClient.Lib
             var qrCodePng = new PngByteQRCode(qrCodeData);
             return qrCodePng.GetGraphic(20);
         }
+
+        #endregion
 
         #region Private Methods
 
