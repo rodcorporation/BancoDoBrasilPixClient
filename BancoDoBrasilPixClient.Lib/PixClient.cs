@@ -75,7 +75,7 @@ namespace BancoDoBrasilPixClient.Lib
         {
             var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetOAuthUrl(_environmentType)}/oauth/token");
             request.Method = "POST";
-            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.UserAgent = "BancoDoBrasilPixClient";
             request.ContentType = "application/x-www-form-urlencoded";
 
             request.Headers.Add("Authorization", $"Basic {GetBasicAuthorization()}");
@@ -122,8 +122,7 @@ namespace BancoDoBrasilPixClient.Lib
             var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetPixUrl(_environmentType)}/pix/v1?gw-dev-app-key={_applicationKey}&inicio={inicio:yyyy-MM-ddTHH:mm:ss.00-03:00}&fim={fim:yyyy-MM-ddTHH:mm:ss.00-03:00}&paginacao.paginaAtual={paginaAtual}");
 
             request.Method = "GET";
-            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
-            request.ContentType = "application/x-www-form-urlencoded";
+            request.UserAgent = "BancoDoBrasilPixClient";
 
             request.Headers.Add("Authorization", $"Bearer {_jwt}");
 
@@ -160,7 +159,7 @@ namespace BancoDoBrasilPixClient.Lib
             var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetPixUrl(_environmentType)}/pix/v1/cob/{txId}?gw-dev-app-key={_applicationKey}");
 
             request.Method = "GET";
-            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.UserAgent = "BancoDoBrasilPixClient";
             request.ContentType = "application/x-www-form-urlencoded";
 
             request.Headers.Add("Authorization", $"Bearer {_jwt}");
@@ -197,7 +196,7 @@ namespace BancoDoBrasilPixClient.Lib
 
             var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetPixUrl(_environmentType)}/pix/v1/cobqrcode/?gw-dev-app-key={_applicationKey}");
             request.Method = "PUT";
-            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.UserAgent = "BancoDoBrasilPixClient";
             request.ContentType = "application/json";
 
             request.Headers.Add("Authorization", $"Bearer {_jwt}");
@@ -241,7 +240,7 @@ namespace BancoDoBrasilPixClient.Lib
 
             var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetPixUrl(_environmentType)}/pix/v1/cob/{txId}?gw-dev-app-key={_applicationKey}");
             request.Method = "PATCH";
-            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.UserAgent = "BancoDoBrasilPixClient";
             request.ContentType = "application/json";
 
             request.Headers.Add("Authorization", $"Bearer {_jwt}");
@@ -285,7 +284,7 @@ namespace BancoDoBrasilPixClient.Lib
             var request = (HttpWebRequest)WebRequest.Create($"{EnvironmentTypeExtension.GetPixUrl(_environmentType)}/pix/v1/pix/{endToEndId}?gw-dev-app-key={_applicationKey}");
 
             request.Method = "GET";
-            request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36";
+            request.UserAgent = "BancoDoBrasilPixClient";
             request.ContentType = "application/x-www-form-urlencoded";
 
             request.Headers.Add("Authorization", $"Bearer {_jwt}");

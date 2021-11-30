@@ -350,3 +350,5 @@ MigrationBackup/
 .ionide/
 /BancoDoBrasilPixClient.Test/credentials.json
 /BancoDoBrasilPixClient.Lib/PutInNugetOrg.txt
+/BancoDoBrasilPixClient.Test/credentials.production.json
+/BancoDoBrasilPixClient.Test/credentials.development.json

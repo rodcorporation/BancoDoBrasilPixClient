@@ -78,7 +78,7 @@ namespace BancoDoBrasilPixClient.Test
             await client.AutenticarAsync(PixClient.Scopes.AllScopes);
 
             // act
-            var response = await client.ConsultarPixAsync(Convert.ToDateTime($"{DateTime.Now.AddYears(-1):dd/MM/yyyy} 00:00:00"),
+            var response = await client.ConsultarPixAsync(Convert.ToDateTime($"{DateTime.Now.AddDays(-1):dd/MM/yyyy} 00:00:00"),
                                                           Convert.ToDateTime($"{DateTime.Now:dd/MM/yyyy} 23:59:59"),
                                                           1);
 
@@ -97,7 +97,7 @@ namespace BancoDoBrasilPixClient.Test
             client.Autenticar(PixClient.Scopes.AllScopes);
 
             // act
-            var response = client.ConsultarPix(Convert.ToDateTime($"{DateTime.Now.AddYears(-1):dd/MM/yyyy} 00:00:00"),
+            var response = client.ConsultarPix(Convert.ToDateTime($"{DateTime.Now.AddDays(-1):dd/MM/yyyy} 00:00:00"),
                                                Convert.ToDateTime($"{DateTime.Now:dd/MM/yyyy} 23:59:59"),
                                                1);
 
@@ -143,7 +143,6 @@ namespace BancoDoBrasilPixClient.Test
             // assert
             Assert.IsNotNull(response);
         }
-
 
         [TestMethod]
         public void ConsultarPorTxId()
@@ -227,6 +226,7 @@ namespace BancoDoBrasilPixClient.Test
                                        _credentials.ClientId,
                                        _credentials.ClientSecret,
                                        _credentials.ApplicationKey);
+
             client.Autenticar(PixClient.Scopes.AllScopes);
             var request = new CriarCobrancaRequestModel()
             {
@@ -382,7 +382,7 @@ namespace BancoDoBrasilPixClient.Test
                                        _credentials.ApplicationKey);
             await client.AutenticarAsync(PixClient.Scopes.AllScopes);
 
-            var responseConsultar = await client.ConsultarPixAsync(Convert.ToDateTime($"{DateTime.Now.AddYears(-1):dd/MM/yyyy} 00:00:00"),
+            var responseConsultar = await client.ConsultarPixAsync(Convert.ToDateTime($"{DateTime.Now.AddDays(-1):dd/MM/yyyy} 00:00:00"),
                                                                    Convert.ToDateTime($"{DateTime.Now:dd/MM/yyyy} 23:59:59"),
                                                                    1);
 
@@ -403,7 +403,7 @@ namespace BancoDoBrasilPixClient.Test
                                        _credentials.ApplicationKey);
             await client.AutenticarAsync(PixClient.Scopes.AllScopes);
 
-            var responseConsultar = client.ConsultarPix(Convert.ToDateTime($"{DateTime.Now.AddYears(-1):dd/MM/yyyy} 00:00:00"),
+            var responseConsultar = client.ConsultarPix(Convert.ToDateTime($"{DateTime.Now.AddDays(-1):dd/MM/yyyy} 00:00:00"),
                                                         Convert.ToDateTime($"{DateTime.Now:dd/MM/yyyy} 23:59:59"),
                                                         1);
 

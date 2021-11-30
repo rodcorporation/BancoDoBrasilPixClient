@@ -30,6 +30,9 @@ namespace BancoDoBrasilPixClient.Lib.Models
             [JsonProperty("cpf")]
             public string Cpf { get; set; }
 
+            [JsonProperty("cnpj")]
+            public string Cnpj { get; set; }
+
             [JsonProperty("nome")]
             public string Nome { get; set; }
         }

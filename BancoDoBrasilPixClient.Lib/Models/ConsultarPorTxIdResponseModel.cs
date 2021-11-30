@@ -32,6 +32,30 @@ namespace BancoDoBrasilPixClient.Lib.Models
         [JsonProperty("solicitacaoPagador")]
         public string SolicitacaoPagador { get; set; }
 
+        [JsonProperty("pix")]
+        public PixResponseModel[] Pix { get; set; }
+        
+        public class PixResponseModel
+        {
+            [JsonProperty("endToEndId")]
+            public string EndToEndId { get; set; }
+
+            [JsonProperty("txid")]
+            public string TxId { get; set; }
+
+            [JsonProperty("valor")]
+            public decimal Valor { get; set; }
+
+            [JsonProperty("infoPagador")]
+            public string InfoPagador { get; set; }
+
+            [JsonProperty("horario")]
+            public DateTime Horario { get; set; }
+
+            [JsonProperty("pagador")]
+            public PagadorResponseModel Pagador { get; set; }
+        }
+
         public class CalendarioResponseModel
         {
             [JsonProperty("criacao")]
@@ -45,6 +69,21 @@ namespace BancoDoBrasilPixClient.Lib.Models
         {
             [JsonProperty("cpf")]
             public string Cpf { get; set; }
+
+            [JsonProperty("cnpj")]
+            public string Cnpj { get; set; }
+
+            [JsonProperty("nome")]
+            public string Nome { get; set; }
+        }
+
+        public class PagadorResponseModel
+        {
+            [JsonProperty("cpf")]
+            public string Cpf { get; set; }
+
+            [JsonProperty("cnpj")]
+            public string Cnpj { get; set; }
 
             [JsonProperty("nome")]
             public string Nome { get; set; }

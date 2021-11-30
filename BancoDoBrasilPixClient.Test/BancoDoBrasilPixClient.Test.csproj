@@ -58,7 +58,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="credentials.exemple.json" />
+    <None Include="credentials.production.json" />
+    <None Include="credentials.development.json" />
     <None Include="credentials.json" />
     <None Include="packages.config" />
   </ItemGroup>
