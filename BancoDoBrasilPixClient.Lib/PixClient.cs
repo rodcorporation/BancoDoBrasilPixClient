@@ -361,7 +361,7 @@ namespace BancoDoBrasilPixClient.Lib
                 client.BaseAddress = new Uri(EnvironmentTypeExtension.GetPixUrl(_environmentType));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _jwt);
 
-                var uriRecurso = $"/pix/v1?gw-dev-app-key={_applicationKey}&inicio={inicio:yyyy-MM-ddTHH:mm:ss.00-03:00}&fim={fim:yyyy-MM-ddTHH:mm:ss.00-03:00}&paginacao.paginaAtual={paginaAtual}";
+                var uriRecurso = $"/pix/v1?gw-dev-app-key={_applicationKey}&inicio={inicio:yyyy-MM-ddTHH:mm:ss.00-03:00}&fim={fim:yyyy-MM-ddTHH:mm:ss.00-03:00}&paginaAtual={paginaAtual}";
 
                 var responseMessage = await client.GetAsync(uriRecurso);
 
